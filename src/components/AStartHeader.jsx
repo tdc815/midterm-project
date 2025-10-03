@@ -1,4 +1,3 @@
-// src/components/AStartHeader.jsx
 import React from "react";
 
 function AStartHeader() {
@@ -15,7 +14,9 @@ function AStartHeader() {
         color: "#a71622ff",
       }}
     >
-      <h1>ASWANG HUNTER</h1>
+      <h1 style={{ fontSize: "50px" }}>
+        ASWANG HUNTER
+      </h1>
       <h2 style={{ fontFamily: "Century Schoolbook, serif", color: "#ffffff" }}>
         Welcome, this will be a chilling tale of you, a fellow hunter eliminating the monsters of Filipino Folklore. It will be a dangerous yet thrilling journey.
       </h2>

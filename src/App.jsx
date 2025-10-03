@@ -7,6 +7,16 @@ import BGGood from "./assets/BGGoodEnd.png";
 import BGBad from "./assets/BGNoSalt.png";
 import BGGameOver from "./assets/BGBadEnd.png";
 
+const saveGameState = (name, state) => {
+  if (!name) return;
+  localStorage.setItem(`gameState_${name}`, JSON.stringify(state));
+};
+
+const loadGameState = (name) => {
+  const saved = localStorage.getItem(`gameState_${name}`);
+  return saved ? JSON.parse(saved) : null;
+};
+
 function App() {
   const [currentNodeKey, setCurrentNodeKey] = useState("start");
   const [inventory, setInventory] = useState([]);
@@ -20,10 +30,7 @@ function App() {
     if (!currentNode) return;
 
     if (currentNode.onArrive) {
-      if (
-        currentNode.onArrive.addItem &&
-        !inventory.includes(currentNode.onArrive.addItem)
-      ) {
+      if (currentNode.onArrive.addItem && !inventory.includes(currentNode.onArrive.addItem)) {
         setInventory((inv) => [...inv, currentNode.onArrive.addItem]);
       }
       if (currentNode.onArrive.takeDamage) {
@@ -31,6 +38,16 @@ function App() {
       }
     }
   }, [currentNodeKey]);
+
+  useEffect(() => {
+    if (gameStarted && name) {
+      saveGameState(name, {
+        currentNodeKey,
+        inventory,
+        health,
+      });
+    }
+  }, [currentNodeKey, inventory, health, gameStarted, name]);
 
   const handleChoice = (to) => {
     if (!storyData[to]) {
@@ -41,6 +58,9 @@ function App() {
   };
 
   const restartGame = () => {
+    if (name) {
+      localStorage.removeItem(`gameState_${name}`);
+    }
     setCurrentNodeKey("start");
     setInventory([]);
     setHealth(100);
@@ -93,7 +113,20 @@ function App() {
         />
         <button
           disabled={!name.trim()}
-          onClick={() => setGameStarted(true)}
+          onClick={() => {
+            const saved = loadGameState(name.trim());
+            if (saved) {
+              const confirmLoad = window.confirm(
+                `Welcome home Hunter ${name}. Resume your Hunt perhaps?`
+              );
+              if (confirmLoad) {
+                setCurrentNodeKey(saved.currentNodeKey);
+                setInventory(saved.inventory);
+                setHealth(saved.health);
+              }
+            }
+            setGameStarted(true);
+          }}
           style={{
             marginTop: 20,
             padding: "10px 20px",
@@ -154,7 +187,9 @@ function App() {
               fontSize: 32,
             }}
           >
-            {currentNode?.text ? currentNode.text.replace("{name}", name) : "The End"}
+            {currentNode?.text
+              ? currentNode.text.replace("{name}", name)
+              : "The End"}
           </h2>
 
           <div
@@ -169,7 +204,8 @@ function App() {
             {health <= 0 ? (
               <>
                 <p style={{ color: "#fff" }}>
-                  Your wounds are too severe. The darkness consumes you. Your hunt ends in failure.
+                  Your wounds are too severe. The darkness consumes you. Your
+                  hunt ends in failure.
                 </p>
                 <button
                   onClick={restartGame}
@@ -206,8 +242,14 @@ function App() {
               </button>
             ) : currentNode?.choices?.length > 0 ? (
               currentNode.choices
-                .filter((choice) => !choice.requires || inventory.includes(choice.requires))
-                .filter((choice) => !choice.hideIf || !inventory.includes(choice.hideIf))
+                .filter(
+                  (choice) =>
+                    !choice.requires || inventory.includes(choice.requires)
+                )
+                .filter(
+                  (choice) =>
+                    !choice.hideIf || !inventory.includes(choice.hideIf)
+                )
                 .map((choice, i) => (
                   <button
                     key={i}
@@ -238,6 +280,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
