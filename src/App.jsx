@@ -233,9 +233,6 @@ function App() {
                   backgroundColor: "#a71622ff",
                   color: "white",
                   border: "none",
-                  borderRadius: 5,
-                  cursor: "pointer",
-                  border: "2px solid white",
                 }}
               >
                 Restart Game
