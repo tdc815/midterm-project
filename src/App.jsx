@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AStartHeader from "./components/aStartHeader";
+import AStartHeader from "./components/AStartHeader";
 import AStoryInfo from "./components/AStoryInfo";
 import storyData from "./components/story.json";
 import BGStandard from "./assets/BGStandard.png";
